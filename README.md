@@ -25,19 +25,20 @@ Business Value: Use of Netflix application, movie selection
 Grain: 
 --------------------------------------
 Dimentions:
-1)Production_Country (country name)
-2)Movie_Discription (Title;description;Release_year;age_sertification)
+1)Country (country name)
+2)Movie(Title;description;Release_year;age_sertification)
 3)Genres (geners_name)
 4)Type (type name)
-5)Actor_Info (actor_name;Character;Role)
+5)Actor (actor_name;Character;Role)
 --------------------------------------- 
-Fact_Movie
-id	
-runtime	
-seasons	
-imdb_id	
+Fact_table
+
+runtime		
 imdb_score	
 imdb_votes	
 tmdb_popularity	
 tmdb_score
-person_id
+country_id
+movie_id
+Genres_id 
+type_id
