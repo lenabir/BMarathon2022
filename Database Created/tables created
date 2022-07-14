@@ -1,0 +1,166 @@
+Create database BImarathon;
+use bimarathon;
+-- creating a temp tables to load CSV files
+
+	CREATE TABLE temp_movie (
+	movie_id VARCHAR(255),
+    title VARCHAR(500),
+    type VARCHAR(20),
+    description VARCHAR(2000),
+    release_year INT,
+    age_certification VARCHAR(100),
+    runtime INT,
+    genres VARCHAR(200),
+    production_countries VARCHAR(20),
+    seasons VARCHAR(200),
+    imdb_score float,
+    imdb_votes INT,
+    tmdb_popularity float,
+    tmdb_score float
+);
+CREATE TABLE temp_actor (
+	movie_id VARCHAR(255),
+    name VARCHAR(255),
+	movie_character VARCHAR(255),
+	role VARCHAR(20)
+);
+-- creating dim table country 
+create table dim_country (
+	country_id int not null auto_increment
+    , country_name varchar(500)
+    , primary key (country_id)
+)
+;
+use bimarathon;
+-- creating dim table country 
+
+create table dim_country (
+	country_id int not null auto_increment
+    , country_name varchar(500)
+    , primary key (country_id)
+)
+;
+INSERT IGNORE INTO dim_country (country_name)
+SELECT DISTINCT
+	  tmp.production_countries
+FROM temp_movie tmp
+;
+-- creating tables dim_genres
+create table dim_genres (
+	genres_id int not null auto_increment
+    , genres_name VARCHAR(200)
+    , primary key (genres_id)
+)
+;
+INSERT IGNORE INTO dim_genres (genres_name)
+SELECT DISTINCT
+	  tmp.genres
+FROM temp_movie tmp
+;
+select * from dim_genres;
+
+ --creating table dim_type
+ 
+create table dim_type (
+	type_id int not null auto_increment
+    , type_name VARCHAR(20)
+    , primary key (type_id)
+)
+;
+INSERT IGNORE INTO dim_type (type_name)
+SELECT DISTINCT
+	  tmp.type
+FROM temp_movie tmp
+;
+-- creating tables dim_movie
+create table dim_movie (
+	movie_id varchar(255) not null
+    , title VARCHAR(500)
+    , description VARCHAR(2000)
+    , release_year INT
+    , age_certification VARCHAR(100)
+    , seasons VARCHAR(200)
+    , primary key (movie_id)
+)
+;
+INSERT IGNORE INTO dim_movie (movie_id, title,description, release_year,age_certification, seasons)
+SELECT DISTINCT
+	tmp.movie_id,
+    tmp.title,
+    tmp.description,
+    tmp.release_year,
+    tmp.age_certification,
+    tmp.seasons
+FROM temp_movie tmp
+;
+-- creating tables dim_actor
+create table dim_actor (
+	actor_id int not null auto_increment
+    , movie_id varchar(255)
+    , name VARCHAR(255)
+	, movie_character VARCHAR(255)
+	, role VARCHAR(20)
+    , primary key (actor_id)
+    , FOREIGN KEY (movie_id)
+        REFERENCES dim_movie (movie_id)
+        ON DELETE SET NULL
+)
+;
+INSERT IGNORE INTO dim_actor (movie_id, name, movie_character, role)
+SELECT DISTINCT
+    dm.movie_id,
+    ta.name,
+    ta.movie_character,
+    ta.role
+FROM temp_actor ta
+inner JOIN dim_movie dm ON ta.movie_id = dm.movie_id
+;
+select* from dim_actor;
+-- create table fact table movie 
+
+create table fact_movie (
+	  fact_id int not null auto_increment
+    , movie_id varchar(255)
+    , country_id INT
+    , type_id INT
+    , genres_id INT
+    , runtime INT
+    , imdb_score float
+    , imdb_votes INT
+    , tmdb_popularity float
+    , tmdb_score float
+    , primary key (fact_id)
+    , FOREIGN KEY (movie_id)
+        REFERENCES dim_movie (movie_id)
+        ON DELETE SET NULL
+    , FOREIGN KEY (country_id)
+        REFERENCES dim_country (country_id)
+        ON DELETE SET NULL
+    , FOREIGN KEY (type_id)
+        REFERENCES dim_type (type_id)
+        ON DELETE SET NULL    
+     , FOREIGN KEY (genres_id)
+        REFERENCES dim_genres (genres_id)
+        ON DELETE SET NULL    
+)
+;
+INSERT IGNORE INTO fact_movie (movie_id, country_id, type_id, genres_id, runtime, imdb_score, imdb_votes, tmdb_popularity,
+ tmdb_score)
+SELECT DISTINCT
+    dm.movie_id,
+    dc.country_id,
+    dt.type_id,
+    dg.genres_id,
+    tm.runtime,
+    tm.imdb_score,
+    tm.imdb_votes,
+    tm.tmdb_popularity,
+    tm.tmdb_score
+FROM temp_movie tm
+inner JOIN dim_movie dm ON tm.movie_id = dm.movie_id
+inner JOIN dim_country dc ON tm.production_countries = dc.country_name
+inner JOIN dim_type dt ON tm.type = dt.type_name
+inner JOIN dim_genres dg ON tm.genres = dg.genres_name
+;
+select * from fact_movie;
+
