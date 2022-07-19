@@ -1,0 +1,96 @@
+--week 4 homework practies
+
+-- seslect command 
+
+select *
+from dim_actor;
+select *
+from dim_genres;
+select name,
+actor_id 
+from dim_actor;
+
+--limit command
+
+select name,
+actor_id
+from dim_actor
+limit 15;
+
+select movie_id,
+description
+from dim_movie;
+
+select movie_id,
+description
+from dim_movie
+limit 20;
+
+--where clause practice 
+
+select *
+from dim_actor
+where name = 'smith';
+
+select *
+from dim_movie 
+where movie_id = '5';
+
+--where with IN, NOT IN, Between
+
+select * 
+from dim_actor 
+where actor_id in (2,4,5);
+
+select * 
+from dim_actor 
+where actor_id not in (2,4,5);
+
+select * 
+from dim_actor 
+where actor_id between 4 and 50;
+
+select *
+from dim_genres
+where genres_name not in ('comedy');
+
+--null values, it is not the same as zero, no values at all 
+
+insert into dim_actor
+values (126957, 'dbtm159', '125 west game', 'gangster', 'boy');
+
+create database test_bi;
+drop database test_bi;  
+--only used to practice;
+
+describe dim_country; 
+
+alter table dim_country
+add county varchar(50);
+
+alter table dim_country 
+drop county;
+
+alter table dim_country 
+modify country_name varchar(300);
+
+select 
+distinct name
+from dim_actor;
+
+--like
+
+select*
+from dim_actor 
+where name like 'ro%';
+
+-- temp names of the columns 
+
+select *
+from dim_country;
+
+select country_name as "name_country"
+from dim_country;
+select country_name as "country_name"
+from dim_country;
+
