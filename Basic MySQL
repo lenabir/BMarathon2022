@@ -94,3 +94,60 @@ from dim_country;
 select country_name as "country_name"
 from dim_country;
 
+week 5 H/W 
+Netflix:
+
+1. Perform LEFT, RIGHT, UNION joins with your dataset
+2. 
+-- Find all movies and any imdb_scoring associated with those movies
+
+Select dm.title, imdb_score
+from dim_movie as dm
+left join fact_movie as fm on fm.movie_id = dm.movie_id
+
+
+3. Find all years and any associated movies names
+
+select dm.release_year, title 
+from dim_movie as dm
+left join fact_movie as fm on fm.movie_id = dm.movie_id
+group by title;
+
+4. Present all unique movie IDs from dim movie and fact table
+
+select movie_id from dim_movie
+union 
+select movie_id from fact_movie;
+
+5. Calculate how many movies an each unique actor had
+
+SELECT distinct name, COUNT(movie_id) FROM dim_actor
+GROUP BY name
+
+
+6. How many TV-Shows was released in 2020
+
+select count(distinct fm.movie_id)
+from fact_movie as fm
+inner join dim_movie as dm on dm.movie_id = fm.movie_id
+where dm.release_year = 2020;
+
+select count(fm.movie_id)
+from fact_movie as fm
+inner join dim_movie as dm on dm.movie_id = fm.movie_id
+where dm.release_year = 2020;
+
+7. Present average tmdb popularity for each genres
+
+select genres_name, avg(fm.tmdb_popularity)
+from fact_movie as fm
+inner join dim_genres as dg on dg.genres_id = fm.genres_id
+group by dg.genres_name;
+
+8. What is the percentage of movies in "GB" country
+
+select count(fm.movie_id)
+ from fact_movie as fm
+ inner join dim_country as dc on dc.country_id = fm.country_id
+inner join dim_movie as dm on dm.movie_id = fm.movie_id
+where dc.country_name = 'GB';
